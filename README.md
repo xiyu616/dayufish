@@ -28,7 +28,7 @@
 | 4 | [子进程崩了把宿主带走](docs/04-process-tree.md) | 重型子进程必须踢出进程树 |
 | 5 | [重复花钱、重复犯错](docs/05-burn-and-memory.md) | 省钱 = 别让它重复发现昨天已知的事 |
 
-还有两篇： [06 三个现场](docs/06-real-logs.md) 是三次事故的原始日志，没有结论只有证据；[07 Linux 对应写法](docs/07-linux.md) 是把上面这套搬到 Linux 时哪些要重写。
+还有两篇： [06 三个现场](docs/06-real-logs.md) 是三次事故的原始日志，没有结论只有证据；[07 Linux 对应写法](docs/07-linux.md) 是把上面这套搬到 Linux 时哪些要重写；[08 脚本实测](docs/08-script-runs.md) 是三个脚本真跑一遍的输出，含跑出来的两个坑。
 
 ## 脚本
 
@@ -91,7 +91,7 @@ powershell -ExecutionPolicy Bypass -File revert-host.ps1 `
 ## 状态
 
 v0.1。骨架 + 三个脚本 + 五篇事故复盘 + 上手清单。
-已补：真实事故日志（[06](docs/06-real-logs.md)）、计划任务完整注册命令（[03 末尾](docs/03-missed-schedule.md)）、[07 Linux 对应写法](docs/07-linux.md)。接下来补：三个脚本的实测输出。
+八篇都在了：五个坑（01-05）+ 原始日志（06）+ Linux 写法（07）+ 脚本实测（08）。下一步是把这套东西推出去，找真有人用。
 
 如果你也在这条路上踩了别的坑，欢迎开 issue —— 我大概率也踩过。
 还有这是我大肥鱼自己写的，坑也是自己踩的。

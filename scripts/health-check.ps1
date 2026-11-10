@@ -37,6 +37,7 @@ $ErrorActionPreference = "Continue"
 $log = if ([System.IO.Path]::IsPathRooted($LogFile)) { $LogFile } else { Join-Path $Root $LogFile }
 $statePath = if ([System.IO.Path]::IsPathRooted($StateFile)) { $StateFile } else { Join-Path $Root $StateFile }
 $stamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
+$null = New-Item -ItemType Directory -Force -Path (Split-Path $log), (Split-Path $statePath)
 
 function Write-Log($msg) { Add-Content -Path $log -Value "$stamp $msg" -Encoding UTF8 }
 
