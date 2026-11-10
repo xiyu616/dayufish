@@ -1,4 +1,4 @@
-﻿# 坑 3：重启之后，定时任务不会补跑
+# 坑 3：重启之后，定时任务不会补跑
 
 ## 现象
 
@@ -74,3 +74,44 @@ if ($args -contains "--help" -or $args -contains "-h") { Show-Usage; exit 0 }
 ## 一句话教训
 
 **补跑是补救，不是修复。** 时间敏感的任务，脚本内部必须再判断一次时间。
+---
+
+## 附：把任务注册对（可复制的完整命令）
+
+```powershell
+$py   = 'C:\work\venv\Scripts\python.exe'
+$work = 'C:\work\script'
+$name = 'MyDailyTask'
+
+$act = New-ScheduledTaskAction -Execute $py -Argument '-u daily.py' -WorkingDirectory $work
+
+$trg = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday,Tuesday,Wednesday,Thursday,Friday -At '09:05'
+
+$set = New-ScheduledTaskSettingsSet `
+    -StartWhenAvailable `
+    -WakeToRun `
+    -MultipleInstances IgnoreNew `
+    -ExecutionTimeLimit (New-TimeSpan -Minutes 30)
+
+$pri = New-ScheduledTaskPrincipal -UserId $env:USERNAME -LogonType S4U -RunLevel Limited
+
+Register-ScheduledTask -TaskName $name -Action $act -Trigger $trg -Settings $set -Principal $pri -Force
+```
+
+关键是 `-Settings`。不给它，就落回默认值：**不补跑**、允许并发实例、跑飞了不超时。
+
+三个坑，都踩过：
+
+1. `-StartWhenAvailable` 就是界面上的「如果错过计划的开始时间，请尽快启动任务」。关机、休眠、睡过头，靠它补。**没有它，错过就是永远错过。**
+2. 给触发器加重复杂间隔时，别拿 `[TimeSpan]::MaxValue` 当 `RepetitionDuration`：注册会报 XML 越界（`P99999999DT...`），用 `[TimeSpan]::FromDays(3650)`。
+3. `-LogonType S4U` 不用存密码，但**访问网络共享会失败**；要读网络盘就换 `-LogonType Password` 并保存凭据。
+
+注册完必须验一次，别只看 State：
+
+```powershell
+Start-ScheduledTask -TaskName $name
+Start-Sleep 20
+Get-ScheduledTaskInfo -TaskName $name | % { '{0} 0x{1:X}' -f $_.LastTaskResult, $_.LastTaskResult }
+```
+
+`0x0` 才是真跑过。`0x41303`（267011）是「从来没跑过」——`State=Ready` 不代表它跑过。
