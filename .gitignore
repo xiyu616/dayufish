@@ -1,0 +1,5 @@
+﻿*.log
+health-state.json
+*备份*.json
+*qq-bridge-config*.json
+node_modules/
